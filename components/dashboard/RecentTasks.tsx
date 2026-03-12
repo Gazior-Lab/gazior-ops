@@ -1,9 +1,11 @@
+"use client";
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Clock, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { createPageUrl } from "@/utils";
 
 const statusColors = {
@@ -29,7 +31,7 @@ export default function RecentTasks({ tasks }) {
       <CardHeader className="flex flex-row items-center justify-between pb-3">
         <CardTitle className="text-base font-semibold">Recent Tasks</CardTitle>
         <Link
-          to={createPageUrl("Tasks")}
+          href={createPageUrl("Tasks")}
           className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
         >
           View all <ArrowRight className="w-3.5 h-3.5" />
