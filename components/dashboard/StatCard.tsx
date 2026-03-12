@@ -1,14 +1,24 @@
+"use client";
 import React from "react";
 import { Card } from "@/components/ui/card";
+import { LucideIcon } from "lucide-react";
+
+type StatCardProps = {
+  title: string;
+  value: string | number;
+  icon: LucideIcon;
+  color?: "indigo" | "green" | "orange" | "red" | "blue" | "purple";
+  subtitle?: string;
+};
 
 export default function StatCard({
   title,
   value,
   icon: Icon,
-  color,
+  color = "indigo",
   subtitle,
-}) {
-  const colorMap = {
+}: StatCardProps) {
+  const colorMap: Record<NonNullable<StatCardProps["color"]>, string> = {
     indigo: "bg-indigo-50 text-indigo-600",
     green: "bg-emerald-50 text-emerald-600",
     orange: "bg-orange-50 text-orange-600",
@@ -25,9 +35,7 @@ export default function StatCard({
           <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
           {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
         </div>
-        <div
-          className={`p-2.5 rounded-xl ${colorMap[color] || colorMap.indigo}`}
-        >
+        <div className={`p-2.5 rounded-xl ${colorMap[color]}`}>
           <Icon className="w-5 h-5" />
         </div>
       </div>

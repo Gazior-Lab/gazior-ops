@@ -1,9 +1,16 @@
-import { clsx } from "clsx";
+import { clsx, ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-export function cn(...inputs) {
+/**
+ * Combines class names using clsx and merges Tailwind classes with twMerge.
+ * Accepts any number of clsx-compatible inputs.
+ */
+export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
 
-export const isIframe =
+/**
+ * Detects if the current page is running inside an iframe.
+ */
+export const isIframe: boolean =
   typeof window !== "undefined" ? window.self !== window.top : false;

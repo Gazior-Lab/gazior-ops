@@ -1,11 +1,9 @@
 "use client";
 
 import { ReactNode } from "react";
-import { QueryClientProvider } from "@tanstack/react-query";
-
-import { queryClientInstance } from "@/lib/query-client";
 import { AuthProvider } from "@/lib/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
+import MainContext from "@/context/MainContext";
 
 type ProvidersProps = {
   children: ReactNode;
@@ -13,12 +11,11 @@ type ProvidersProps = {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
+    <MainContext>
+      <AuthProvider>
         {children}
         <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </MainContext>
   );
 }
-

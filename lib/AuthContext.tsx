@@ -7,15 +7,29 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { base44 } from "@/api/base44Client";
+
+type User = {
+  id: string;
+  fullName: string;
+  email: string;
+  role?: string;
+  department?: string;
+};
+
+type AuthError = {
+  type: string;
+  message: string;
+} | null;
+
+type AppPublicSettings = Record<string, any>;
 
 type AuthContextValue = {
-  user: any;
+  user: User | null;
   isAuthenticated: boolean;
   isLoadingAuth: boolean;
   isLoadingPublicSettings: boolean;
-  authError: any;
-  appPublicSettings: any;
+  authError: AuthError;
+  appPublicSettings: AppPublicSettings | null;
   logout: (shouldRedirect?: boolean) => void;
   navigateToLogin: () => void;
   checkAppState: () => Promise<void>;
@@ -23,30 +37,42 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isLoadingPublicSettings] = useState(false);
-  const [authError, setAuthError] = useState<any>(null);
-  const [appPublicSettings] = useState<any>(null);
+  const [authError, setAuthError] = useState<AuthError>(null);
+  const [appPublicSettings] = useState<AppPublicSettings | null>(null);
 
   useEffect(() => {
     checkAppState();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const checkAppState = async () => {
+  // Mock check authentication
+  const checkAppState = async (): Promise<void> => {
     try {
-      setAuthError(null);
       setIsLoadingAuth(true);
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
+      setAuthError(null);
+
+      // Mock: pretend we fetch user info
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const mockUser: User = {
+        id: "1",
+        fullName: "John Doe",
+        email: "john@example.com",
+        role: "admin",
+        department: "development",
+      };
+
+      setUser(mockUser);
       setIsAuthenticated(true);
       setIsLoadingAuth(false);
     } catch (error: any) {
-      // eslint-disable-next-line no-console
-      console.error("Auth check failed:", error);
       setIsAuthenticated(false);
       setIsLoadingAuth(false);
       setAuthError({
@@ -56,19 +82,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = (shouldRedirect = true) => {
+  const logout = (shouldRedirect = true): void => {
     setUser(null);
     setIsAuthenticated(false);
     if (shouldRedirect && typeof window !== "undefined") {
-      base44.auth.logout(window.location.href);
-    } else {
-      base44.auth.logout();
+      console.log("Redirect to login page");
     }
   };
 
-  const navigateToLogin = () => {
+  const navigateToLogin = (): void => {
     if (typeof window !== "undefined") {
-      base44.auth.redirectToLogin(window.location.href);
+      console.log("Navigate to login page");
     }
   };
 
@@ -91,7 +115,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextValue => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+"use client";
+import * as React from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,8 +21,39 @@ import {
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 
-export default function TaskFormDialog({ open, onOpenChange, task, onSaved }) {
-  const [form, setForm] = useState({
+// Mock members and tasks
+const mockMembers = [
+  { id: "1", email: "alice@example.com", full_name: "Alice Johnson" },
+  { id: "2", email: "bob@example.com", full_name: "Bob Smith" },
+];
+
+export type TaskType = {
+  id?: string;
+  title: string;
+  description: string;
+  assigned_to: string;
+  assigned_to_name: string;
+  status: "backlog" | "todo" | "in_progress" | "review" | "done";
+  priority: "low" | "medium" | "high" | "urgent";
+  department: "development" | "marketing" | "design";
+  due_date: string;
+  tags: string[];
+};
+
+type Props = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  task?: TaskType;
+  onSaved: (task: TaskType) => void;
+};
+
+export default function TaskFormDialog({
+  open,
+  onOpenChange,
+  task,
+  onSaved,
+}: Props) {
+  const [form, setForm] = useState<TaskType>({
     title: "",
     description: "",
     assigned_to: "",
@@ -32,27 +64,16 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSaved }) {
     due_date: "",
     tags: [],
   });
-  const [members, setMembers] = useState([]);
+
+  const [members] = useState(mockMembers);
   const [saving, setSaving] = useState(false);
   const [tagInput, setTagInput] = useState("");
 
-  useEffect(() => {
-    base44.entities.User.list()
-      .then(setMembers)
-      .catch(() => {});
-  }, []);
-
+  // Sync task into form when opening
   useEffect(() => {
     if (task) {
       setForm({
-        title: task.title || "",
-        description: task.description || "",
-        assigned_to: task.assigned_to || "",
-        assigned_to_name: task.assigned_to_name || "",
-        status: task.status || "todo",
-        priority: task.priority || "medium",
-        department: task.department || "development",
-        due_date: task.due_date || "",
+        ...task,
         tags: task.tags || [],
       });
     } else {
@@ -70,7 +91,7 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSaved }) {
     }
   }, [task, open]);
 
-  const handleMemberSelect = (email) => {
+  const handleMemberSelect = (email: string) => {
     const member = members.find((m) => m.email === email);
     setForm((prev) => ({
       ...prev,
@@ -79,7 +100,7 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSaved }) {
     }));
   };
 
-  const handleAddTag = (e) => {
+  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tagInput.trim()) {
       e.preventDefault();
       if (!form.tags.includes(tagInput.trim())) {
@@ -89,21 +110,19 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSaved }) {
     }
   };
 
-  const removeTag = (tag) => {
+  const removeTag = (tag: string) => {
     setForm((prev) => ({ ...prev, tags: prev.tags.filter((t) => t !== tag) }));
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!form.title.trim()) return;
     setSaving(true);
-    if (task) {
-      await base44.entities.Task.update(task.id, form);
-    } else {
-      await base44.entities.Task.create(form);
-    }
-    setSaving(false);
-    onSaved();
-    onOpenChange(false);
+    setTimeout(() => {
+      // simulate saving
+      setSaving(false);
+      onSaved(form);
+      onOpenChange(false);
+    }, 500);
   };
 
   return (
@@ -141,7 +160,9 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSaved }) {
               <Label>Department</Label>
               <Select
                 value={form.department}
-                onValueChange={(v) => setForm({ ...form, department: v })}
+                onValueChange={(v) =>
+                  setForm({ ...form, department: v as TaskType["department"] })
+                }
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
@@ -157,7 +178,9 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSaved }) {
               <Label>Priority</Label>
               <Select
                 value={form.priority}
-                onValueChange={(v) => setForm({ ...form, priority: v })}
+                onValueChange={(v) =>
+                  setForm({ ...form, priority: v as TaskType["priority"] })
+                }
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
@@ -169,36 +192,6 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSaved }) {
                   <SelectItem value="urgent">Urgent</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Status</Label>
-              <Select
-                value={form.status}
-                onValueChange={(v) => setForm({ ...form, status: v })}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="backlog">Backlog</SelectItem>
-                  <SelectItem value="todo">To Do</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="review">Review</SelectItem>
-                  <SelectItem value="done">Done</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Due Date</Label>
-              <Input
-                type="date"
-                value={form.due_date}
-                onChange={(e) => setForm({ ...form, due_date: e.target.value })}
-                className="mt-1"
-              />
             </div>
           </div>
 
@@ -221,7 +214,7 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSaved }) {
           <div>
             <Label>Tags</Label>
             <div className="flex flex-wrap gap-1.5 mt-1">
-              {form.tags.map((tag) => (
+              {form.tags?.map((tag) => (
                 <span
                   key={tag}
                   className="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-xs rounded-full cursor-pointer hover:bg-indigo-100"

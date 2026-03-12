@@ -3,12 +3,23 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import { Clock, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { createPageUrl } from "@/utils";
 
-const statusColors = {
+type Task = {
+  id: string | number;
+  title: string;
+  assigned_to_name?: string;
+  status?: "backlog" | "todo" | "in_progress" | "review" | "done";
+  priority?: "low" | "medium" | "high" | "urgent";
+};
+
+type RecentTasksProps = {
+  tasks: Task[];
+};
+
+const statusColors: Record<NonNullable<Task["status"]>, string> = {
   backlog: "bg-gray-100 text-gray-600",
   todo: "bg-blue-100 text-blue-700",
   in_progress: "bg-amber-100 text-amber-700",
@@ -16,14 +27,14 @@ const statusColors = {
   done: "bg-emerald-100 text-emerald-700",
 };
 
-const priorityDots = {
+const priorityDots: Record<NonNullable<Task["priority"]>, string> = {
   low: "bg-gray-400",
   medium: "bg-blue-500",
   high: "bg-orange-500",
   urgent: "bg-red-500",
 };
 
-export default function RecentTasks({ tasks }) {
+export default function RecentTasks({ tasks }: RecentTasksProps) {
   const recent = tasks.slice(0, 6);
 
   return (
@@ -47,7 +58,9 @@ export default function RecentTasks({ tasks }) {
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <div
-              className={`w-2 h-2 rounded-full shrink-0 ${priorityDots[task.priority]}`}
+              className={`w-2 h-2 rounded-full shrink-0 ${
+                priorityDots[task.priority ?? "medium"]
+              }`}
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
@@ -58,9 +71,11 @@ export default function RecentTasks({ tasks }) {
               </p>
             </div>
             <Badge
-              className={`text-[10px] shrink-0 ${statusColors[task.status]}`}
+              className={`text-[10px] shrink-0 ${
+                statusColors[task.status ?? "todo"]
+              }`}
             >
-              {task.status?.replace(/_/g, " ")}
+              {(task.status ?? "todo").replace(/_/g, " ")}
             </Badge>
           </div>
         ))}

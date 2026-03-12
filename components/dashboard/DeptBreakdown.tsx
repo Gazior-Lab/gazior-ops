@@ -1,6 +1,18 @@
+"use client";
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Code2, Palette, BarChart3 } from "lucide-react";
+
+type Task = {
+  id: string | number;
+  department?: "development" | "marketing" | "design";
+  status?: "backlog" | "todo" | "in_progress" | "review" | "done";
+};
+
+type DeptBreakdownProps = {
+  tasks: Task[];
+};
 
 const deptConfig = {
   development: {
@@ -21,18 +33,20 @@ const deptConfig = {
     bg: "bg-purple-50",
     bar: "bg-purple-500",
   },
-};
+} as const;
 
-export default function DeptBreakdown({ tasks }) {
-  const total = tasks.length || 1;
-  const depts = ["development", "marketing", "design"].map((d) => {
+export default function DeptBreakdown({ tasks }: DeptBreakdownProps) {
+  const totalTasks = tasks.length || 1;
+
+  const depts = (["development", "marketing", "design"] as const).map((d) => {
     const deptTasks = tasks.filter((t) => t.department === d);
-    const done = deptTasks.filter((t) => t.status === "done").length;
+    const doneCount = deptTasks.filter((t) => t.status === "done").length;
+
     return {
       name: d,
       total: deptTasks.length,
-      done,
-      pct: Math.round((deptTasks.length / total) * 100),
+      done: doneCount,
+      pct: Math.round((deptTasks.length / totalTasks) * 100),
       ...deptConfig[d],
     };
   });

@@ -1,6 +1,5 @@
 import * as React from "react";
-import { cva } from "class-variance-authority";
-
+import { cva, VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
@@ -23,10 +22,17 @@ const badgeVariants = cva(
   },
 );
 
-function Badge({ className, variant, ...props }) {
+// Props type with variant support
+interface BadgeProps
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+// Forwarding ref is optional, here we keep a simple functional component
+const Badge: React.FC<BadgeProps> = ({ className, variant, ...props }) => {
   return (
     <div className={cn(badgeVariants({ variant }), className)} {...props} />
   );
-}
+};
 
 export { Badge, badgeVariants };

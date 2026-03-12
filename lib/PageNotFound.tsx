@@ -1,22 +1,22 @@
-import { useLocation } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+"use client";
 
-export default function PageNotFound({}) {
-  const location = useLocation();
-  const pageName = location.pathname.substring(1);
+import { usePathname } from "next/navigation";
 
-  const { data: authData, isFetched } = useQuery({
-    queryKey: ["user"],
-    queryFn: async () => {
-      try {
-        const user = await base44.auth.me();
-        return { user, isAuthenticated: true };
-      } catch (error) {
-        return { user: null, isAuthenticated: false };
-      }
-    },
-  });
+type AuthData = {
+  user: { role: string } | null;
+  isAuthenticated: boolean;
+};
+
+export default function PageNotFound() {
+  const pathname = usePathname();
+  const pageName = pathname;
+
+  // Mock auth data
+  const authData: AuthData = {
+    user: { role: "admin" }, // Change to "user" to test non-admin view
+    isAuthenticated: true,
+  };
+  const isFetched = true;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
@@ -35,7 +35,7 @@ export default function PageNotFound({}) {
             </h2>
             <p className="text-slate-600 leading-relaxed">
               The page{" "}
-              <span className="font-medium text-slate-700">"{pageName}"</span>{" "}
+              <span className="font-medium text-slate-700">{pageName}</span>{" "}
               could not be found in this application.
             </p>
           </div>
@@ -46,7 +46,7 @@ export default function PageNotFound({}) {
             authData.user?.role === "admin" && (
               <div className="mt-8 p-4 bg-slate-100 rounded-lg border border-slate-200">
                 <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center mt-0.5">
+                  <div className="shrink-0 w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center mt-0.5">
                     <div className="w-2 h-2 rounded-full bg-orange-400"></div>
                   </div>
                   <div className="text-left space-y-1">
@@ -54,8 +54,8 @@ export default function PageNotFound({}) {
                       Admin Note
                     </p>
                     <p className="text-sm text-slate-600 leading-relaxed">
-                      This could mean that the AI hasn't implemented this page
-                      yet. Ask it to implement it in the chat.
+                      {`This could mean that the AI hasn't implemented this page
+                      yet. Ask it to implement it in the chat.`}
                     </p>
                   </div>
                 </div>
