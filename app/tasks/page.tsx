@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +24,7 @@ import {
 } from "@/components/ui/table";
 import { Plus, Search, Filter } from "lucide-react";
 import { format } from "date-fns";
-import TaskFormDialog from "@/components/tasks/TaskFormDialog";
+import TaskFormDialog from "@/components/tasks/TaskForm";
 import TaskDetailSheet from "@/components/tasks/TaskDetailSheet";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -71,8 +72,9 @@ export default function Tasks() {
   });
 
   return (
-    <div className="p-4 lg:p-8 max-w-7xl mx-auto space-y-5">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <Layout currentPageName="Tasks">
+      <div className="p-4 lg:p-8 max-w-7xl mx-auto space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Tasks</h2>
           <p className="text-sm text-gray-500 mt-0.5">
@@ -89,8 +91,8 @@ export default function Tasks() {
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-center">
+        {/* Filters */}
+        <div className="flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
@@ -136,10 +138,10 @@ export default function Tasks() {
             <SelectItem value="urgent">Urgent</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+        </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border overflow-hidden">
+        {/* Table */}
+        <div className="bg-white rounded-xl border overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50/50">
@@ -243,7 +245,7 @@ export default function Tasks() {
         </Table>
       </div>
 
-      <TaskFormDialog
+        <TaskFormDialog
         open={formOpen}
         onOpenChange={setFormOpen}
         task={editingTask}
@@ -266,6 +268,7 @@ export default function Tasks() {
           if (refreshed) setSelectedTask(refreshed);
         }}
       />
-    </div>
+      </div>
+    </Layout>
   );
 }
