@@ -1,6 +1,9 @@
+"use client";
+
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Layout from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, GripVertical } from "lucide-react";
-import TaskFormDialog from "@/components/tasks/TaskFormDialog";
+import TaskFormDialog from "@/components/tasks/TaskForm";
 import TaskDetailSheet from "@/components/tasks/TaskDetailSheet";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -61,7 +64,8 @@ export default function Board() {
   };
 
   return (
-    <div className="p-4 lg:p-8 max-w-full mx-auto space-y-5">
+    <Layout currentPageName="Board">
+      <div className="p-4 lg:p-8 max-w-full mx-auto space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Board</h2>
@@ -186,6 +190,7 @@ export default function Board() {
           if (refreshed) setSelectedTask(refreshed);
         }}
       />
-    </div>
+      </div>
+    </Layout>
   );
 }

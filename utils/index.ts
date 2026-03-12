@@ -1,3 +1,5 @@
 export function createPageUrl(pageName: string) {
-  return "/" + pageName.replace(/ /g, "-");
+  // Next.js app routes are defined in lowercase folders (e.g. /dashboard, /tasks)
+  // so we normalize the generated URL segment to lowercase.
+  return "/" + pageName.replace(/ /g, "-").toLowerCase();
 }
