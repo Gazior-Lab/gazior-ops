@@ -17,7 +17,7 @@ interface PropsType {
 }
 
 const user = {
-  full_name: "Zisan Ahmed",
+  full_name: "Zisanur Haque",
   department: "R&D Operations",
   role: "Product Lead",
 };
