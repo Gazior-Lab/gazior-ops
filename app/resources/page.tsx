@@ -1,418 +1,226 @@
 "use client";
 
-import React, { useState } from "react";
 import Layout from "@/components/Layout";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Plus,
-  ExternalLink,
+  Folder,
   FileText,
-  Wrench,
-  BookOpen,
-  LayoutTemplate,
-  BookMarked,
-  Package,
+  Link as LinkIcon,
+  Star,
   Upload,
-  Loader2,
-  Trash2,
-  Search,
+  Sparkles,
 } from "lucide-react";
 
-// ---------------- Types ----------------
-type CategoryType =
-  | "document"
-  | "tool"
-  | "guide"
-  | "template"
-  | "reference"
-  | "other";
-
-interface Resource {
+type Resource = {
   id: number;
-  title: string;
-  description?: string;
-  url?: string;
-  file_url?: string;
-  department: string;
-  category: CategoryType;
-}
-
-// ---------------- Mock Data ----------------
-const mockResources: Resource[] = [
-  {
-    id: 1,
-    title: "React Docs",
-    description: "Official React documentation",
-    url: "https://reactjs.org",
-    department: "development",
-    category: "document",
-  },
-  {
-    id: 2,
-    title: "Figma UI Kit",
-    description: "Premium Figma components",
-    file_url: "/mock-files/figma-ui-kit.zip",
-    department: "design",
-    category: "tool",
-  },
-  {
-    id: 3,
-    title: "Marketing Guide 2026",
-    description: "Step-by-step marketing strategies",
-    url: "https://marketingguide.com",
-    department: "marketing",
-    category: "guide",
-  },
-  {
-    id: 4,
-    title: "Template Pack",
-    description: "Project templates for designers",
-    file_url: "/mock-files/template-pack.zip",
-    department: "design",
-    category: "template",
-  },
-];
-
-// ---------------- Category Config ----------------
-const categoryConfig: Record<
-  CategoryType,
-  { icon: React.FC<React.SVGProps<SVGSVGElement>>; color: string }
-> = {
-  document: { icon: FileText, color: "bg-blue-50 text-blue-600" },
-  tool: { icon: Wrench, color: "bg-orange-50 text-orange-600" },
-  guide: { icon: BookOpen, color: "bg-green-50 text-green-600" },
-  template: { icon: LayoutTemplate, color: "bg-purple-50 text-purple-600" },
-  reference: { icon: BookMarked, color: "bg-cyan-50 text-cyan-600" },
-  other: { icon: Package, color: "bg-gray-50 text-gray-600" },
+  name: string;
+  type: "Doc" | "File" | "Link";
+  category: string;
+  updated: string;
+  pinned?: boolean;
 };
 
-// ---------------- Page Component ----------------
-export default function Resources() {
-  const [search, setSearch] = useState("");
-  const [deptFilter, setDeptFilter] = useState("all");
-  const [catFilter, setCatFilter] = useState("all");
-  const [formOpen, setFormOpen] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [resources, setResources] = useState<Resource[]>(mockResources);
-  const [form, setForm] = useState<Omit<Resource, "id">>({
-    title: "",
-    description: "",
-    url: "",
-    file_url: "",
-    department: "all",
-    category: "document",
-  });
-  const [saving, setSaving] = useState(false);
+export default function ResourcesPage() {
+  const resources: Resource[] = [
+    {
+      id: 1,
+      name: "Product Strategy Doc",
+      type: "Doc",
+      category: "Product",
+      updated: "2d ago",
+      pinned: true,
+    },
+    {
+      id: 2,
+      name: "Design System Figma",
+      type: "Link",
+      category: "Design",
+      updated: "1d ago",
+      pinned: true,
+    },
+    {
+      id: 3,
+      name: "API Architecture",
+      type: "Doc",
+      category: "Engineering",
+      updated: "5d ago",
+    },
+    {
+      id: 4,
+      name: "Landing Page Assets",
+      type: "File",
+      category: "Marketing",
+      updated: "3d ago",
+    },
+  ];
 
-  // ---------------- Filtered Resources ----------------
-  const filtered = resources.filter((r) => {
-    const matchSearch =
-      !search || r.title.toLowerCase().includes(search.toLowerCase());
-    const matchDept =
-      deptFilter === "all" ||
-      r.department === "all" ||
-      r.department === deptFilter;
-    const matchCat = catFilter === "all" || r.category === catFilter;
-    return matchSearch && matchDept && matchCat;
-  });
+  const stats = [
+    { label: "Total resources", value: resources.length, icon: Folder },
+    {
+      label: "Documents",
+      value: resources.filter((r) => r.type === "Doc").length,
+      icon: FileText,
+    },
+    {
+      label: "Links",
+      value: resources.filter((r) => r.type === "Link").length,
+      icon: LinkIcon,
+    },
+    {
+      label: "Pinned",
+      value: resources.filter((r) => r.pinned).length,
+      icon: Star,
+    },
+  ];
 
-  // ---------------- Handlers ----------------
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    // Mock upload: in real use your API here
-    setTimeout(() => {
-      setForm((prev) => ({ ...prev, file_url: URL.createObjectURL(file) }));
-      setUploading(false);
-    }, 1000);
-  };
+  const categories = ["Product", "Design", "Engineering", "Marketing"];
 
-  const handleSave = () => {
-    if (!form.title.trim()) return;
-    setSaving(true);
-    setTimeout(() => {
-      setResources((prev) => [...prev, { ...form, id: prev.length + 1 }]);
-      setSaving(false);
-      setForm({
-        title: "",
-        description: "",
-        url: "",
-        file_url: "",
-        department: "all",
-        category: "document",
-      });
-      setFormOpen(false);
-    }, 500);
-  };
-
-  const handleDelete = (id: number) => {
-    setResources((prev) => prev.filter((r) => r.id !== id));
-  };
-
-  // ---------------- Render ----------------
   return (
     <Layout currentPageName="Resources">
-      <div className="p-4 lg:p-8 max-w-7xl mx-auto space-y-5">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Resources</h2>
-            <p className="text-sm text-gray-500 mt-0.5">
-              Shared tools, docs, and references
+      <div className="mx-auto max-w-7xl space-y-6">
+        {/* Hero */}
+        <section className="rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,rgba(59,130,246,0.16),rgba(139,92,246,0.08),rgba(255,255,255,0.03))] p-6 lg:p-8">
+          <div className="max-w-3xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-200">
+              <Sparkles className="h-3.5 w-3.5 text-blue-300" />
+              Resource layer
+            </div>
+
+            <h2 className="text-3xl font-semibold text-white lg:text-4xl">
+              Central hub for all resources and assets
+            </h2>
+
+            <p className="mt-3 text-sm text-slate-300 lg:text-base">
+              Organize files, links, and documents so your team can quickly
+              access what matters without friction.
             </p>
           </div>
-          <Button onClick={() => setFormOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Add Resource
-          </Button>
-        </div>
+        </section>
 
-        {/* Filters */}
-        <div className="flex flex-wrap gap-3 items-center">
-          <div className="relative flex-1 min-w-50 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              placeholder="Search resources..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
-            />
+        {/* Stats */}
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-3xl border border-white/10 bg-white/4 p-5"
+            >
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-sm text-slate-300">{stat.label}</p>
+                  <p className="mt-3 text-3xl text-white">{stat.value}</p>
+                </div>
+                <stat.icon className="h-5 w-5 text-slate-300" />
+              </div>
+            </div>
+          ))}
+        </section>
+
+        {/* Main */}
+        <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+          {/* Left */}
+          <div className="xl:col-span-8 space-y-6">
+            {/* Categories */}
+            <div className="rounded-2xl border border-white/10 bg-white/4 p-5">
+              <h3 className="text-white font-medium mb-4">Categories</h3>
+
+              <div className="flex flex-wrap gap-2">
+                {categories.map((cat) => (
+                  <span
+                    key={cat}
+                    className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs text-slate-300"
+                  >
+                    {cat}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Pinned */}
+            <div className="rounded-2xl border border-white/10 bg-white/4 p-5">
+              <h3 className="text-white font-medium mb-4">Pinned Resources</h3>
+
+              <div className="space-y-3">
+                {resources
+                  .filter((r) => r.pinned)
+                  .map((r) => (
+                    <div
+                      key={r.id}
+                      className="flex justify-between rounded-2xl border border-white/8 bg-black/20 p-4"
+                    >
+                      <div>
+                        <p className="text-white">{r.name}</p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          {r.category} · {r.type}
+                        </p>
+                      </div>
+
+                      <Star className="h-4 w-4 text-yellow-300" />
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* All Resources */}
+            <div className="rounded-2xl border border-white/10 bg-white/4 p-5">
+              <h3 className="text-white font-medium mb-4">All Resources</h3>
+
+              <div className="space-y-3">
+                {resources.map((r) => (
+                  <div
+                    key={r.id}
+                    className="flex justify-between rounded-2xl border border-white/8 bg-black/20 p-4"
+                  >
+                    <div>
+                      <p className="text-white">{r.name}</p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        {r.category} · {r.type}
+                      </p>
+                    </div>
+
+                    <span className="text-xs text-slate-400">{r.updated}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <Select value={deptFilter} onValueChange={setDeptFilter}>
-            <SelectTrigger className="w-36">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Teams</SelectItem>
-              <SelectItem value="development">Development</SelectItem>
-              <SelectItem value="marketing">Marketing</SelectItem>
-              <SelectItem value="design">Design</SelectItem>
-            </SelectContent>
-          </Select>
+          {/* Right */}
+          <div className="xl:col-span-4 space-y-6">
+            {/* Actions */}
+            <div className="rounded-2xl border border-white/10 bg-white/4 p-5">
+              <h3 className="text-white font-medium mb-4">Quick Actions</h3>
 
-          <Select value={catFilter} onValueChange={setCatFilter}>
-            <SelectTrigger className="w-36">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="document">Document</SelectItem>
-              <SelectItem value="tool">Tool</SelectItem>
-              <SelectItem value="guide">Guide</SelectItem>
-              <SelectItem value="template">Template</SelectItem>
-              <SelectItem value="reference">Reference</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+              <div className="space-y-3">
+                <button className="flex w-full items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-sm text-slate-300">
+                  <Upload className="h-4 w-4" />
+                  Upload file
+                </button>
 
-        {/* Resource Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.length === 0 ? (
-            <div className="col-span-full text-center py-16 text-gray-400">
-              <Package className="w-10 h-10 mx-auto mb-3 text-gray-300" />
-              <p>No resources found</p>
-            </div>
-          ) : (
-            filtered.map((resource) => {
-              const config = categoryConfig[resource.category];
-              const Icon = config.icon;
-              return (
-                <Card
-                  key={resource.id}
-                  className="p-5 hover:shadow-md transition-shadow group"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className={`p-2 rounded-lg ${config.color}`}>
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-red-500"
-                      onClick={() => handleDelete(resource.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mt-3 text-sm">
-                    {resource.title}
-                  </h3>
-                  {resource.description && (
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                      {resource.description}
-                    </p>
-                  )}
-                  <div className="flex items-center gap-2 mt-3 flex-wrap">
-                    <Badge variant="outline" className="text-[10px] capitalize">
-                      {resource.category}
-                    </Badge>
-                    {resource.department !== "all" && (
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] capitalize"
-                      >
-                        {resource.department}
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex gap-2 mt-3">
-                    {resource.url && (
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
-                      >
-                        <ExternalLink className="w-3 h-3" /> Open Link
-                      </a>
-                    )}
-                    {resource.file_url && (
-                      <a
-                        href={resource.file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
-                      >
-                        <FileText className="w-3 h-3" /> View File
-                      </a>
-                    )}
-                  </div>
-                </Card>
-              );
-            })
-          )}
-        </div>
+                <button className="flex w-full items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-sm text-slate-300">
+                  <FileText className="h-4 w-4" />
+                  Create document
+                </button>
 
-        {/* Add Resource Dialog */}
-        <Dialog open={formOpen} onOpenChange={setFormOpen}>
-          <DialogContent className="sm:max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Add Resource</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-2">
-              <div>
-                <Label>Title *</Label>
-                <Input
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="Resource title"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label>Description</Label>
-                <Textarea
-                  value={form.description}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
-                  }
-                  placeholder="Brief description"
-                  className="mt-1 h-16"
-                />
-              </div>
-              <div>
-                <Label>URL</Label>
-                <Input
-                  value={form.url}
-                  onChange={(e) => setForm({ ...form, url: e.target.value })}
-                  placeholder="https://..."
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label>Or Upload File</Label>
-                <div className="mt-1">
-                  <label className="flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors text-sm text-gray-600">
-                    {uploading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Upload className="w-4 h-4" />
-                    )}
-                    {form.file_url ? "File uploaded ✓" : "Choose file"}
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={handleUpload}
-                    />
-                  </label>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label>Category</Label>
-                  <Select
-                    value={form.category}
-                    onValueChange={(v) =>
-                      setForm({ ...form, category: v as CategoryType })
-                    }
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="document">Document</SelectItem>
-                      <SelectItem value="tool">Tool</SelectItem>
-                      <SelectItem value="guide">Guide</SelectItem>
-                      <SelectItem value="template">Template</SelectItem>
-                      <SelectItem value="reference">Reference</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Department</Label>
-                  <Select
-                    value={form.department}
-                    onValueChange={(v) => setForm({ ...form, department: v })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Teams</SelectItem>
-                      <SelectItem value="development">Development</SelectItem>
-                      <SelectItem value="marketing">Marketing</SelectItem>
-                      <SelectItem value="design">Design</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <button className="flex w-full items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-sm text-slate-300">
+                  <LinkIcon className="h-4 w-4" />
+                  Add link
+                </button>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setFormOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSave}
-                disabled={saving || !form.title.trim()}
-              >
-                {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                Add
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+
+            {/* Principles */}
+            <div className="rounded-2xl border border-white/10 bg-white/4 p-5">
+              <h3 className="text-white font-medium mb-4">
+                Resource Principles
+              </h3>
+
+              <div className="space-y-3 text-sm text-slate-300">
+                <p>• Keep resources structured and easy to find</p>
+                <p>• Avoid duplication and outdated files</p>
+                <p>• Prioritize clarity over volume</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </Layout>
   );

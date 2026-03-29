@@ -1,313 +1,242 @@
 "use client";
 
-import React, { useState } from "react";
 import Layout from "@/components/Layout";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import {
-  UserPlus,
-  Mail,
-  Code2,
-  Palette,
-  BarChart3,
-  Loader2,
+  AlertTriangle,
+  ArrowUpRight,
+  CheckCircle2,
+  GitBranch,
+  Sparkles,
 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 
-// ---------------- Types ----------------
-type DepartmentType = "development" | "marketing" | "design";
-type RoleType = "member" | "admin";
-
-interface TeamMember {
+type Member = {
   id: number;
-  full_name: string;
-  email: string;
-  department: DepartmentType;
-  role: RoleType;
-  job_title?: string;
-}
-
-interface Task {
-  id: number;
-  assigned_to: string;
-  status: "done" | "pending" | "in-progress";
-}
-
-// ---------------- Mock Data ----------------
-const mockMembers: TeamMember[] = [
-  {
-    id: 1,
-    full_name: "Alice Johnson",
-    email: "alice@company.com",
-    department: "development",
-    role: "admin",
-  },
-  {
-    id: 2,
-    full_name: "Bob Smith",
-    email: "bob@company.com",
-    department: "marketing",
-    role: "member",
-  },
-  {
-    id: 3,
-    full_name: "Clara Adams",
-    email: "clara@company.com",
-    department: "design",
-    role: "member",
-  },
-  {
-    id: 4,
-    full_name: "David Lee",
-    email: "david@company.com",
-    department: "development",
-    role: "member",
-  },
-];
-
-const mockTasks: Task[] = [
-  { id: 1, assigned_to: "alice@company.com", status: "done" },
-  { id: 2, assigned_to: "alice@company.com", status: "pending" },
-  { id: 3, assigned_to: "bob@company.com", status: "done" },
-  { id: 4, assigned_to: "clara@company.com", status: "in-progress" },
-  { id: 5, assigned_to: "david@company.com", status: "done" },
-];
-
-// ---------------- Department Config ----------------
-const deptConfig: Record<
-  DepartmentType,
-  { icon: React.FC<React.SVGProps<SVGSVGElement>>; color: string }
-> = {
-  development: { icon: Code2, color: "bg-blue-50 text-blue-600" },
-  marketing: { icon: BarChart3, color: "bg-green-50 text-green-600" },
-  design: { icon: Palette, color: "bg-purple-50 text-purple-600" },
+  name: string;
+  role: string;
+  team: string;
+  active: number;
+  completed: number;
+  focusLoad: "Low" | "Medium" | "High" | "Critical";
+  dependency: number; // how many tasks depend on this person
+  health: "Healthy" | "Moderate" | "High load" | "At risk";
 };
 
-// ---------------- Avatar Colors ----------------
-const avatarColors = [
-  "bg-indigo-100 text-indigo-700",
-  "bg-emerald-100 text-emerald-700",
-  "bg-amber-100 text-amber-700",
-  "bg-rose-100 text-rose-700",
-  "bg-cyan-100 text-cyan-700",
-  "bg-violet-100 text-violet-700",
-];
+export default function TeamPage() {
+  const members: Member[] = [
+    {
+      id: 1,
+      name: "Rahim",
+      role: "Frontend Engineer",
+      team: "Development",
+      active: 3,
+      completed: 8,
+      focusLoad: "High",
+      dependency: 4,
+      health: "High load",
+    },
+    {
+      id: 2,
+      name: "Sarah",
+      role: "Product Designer",
+      team: "Design",
+      active: 2,
+      completed: 6,
+      focusLoad: "Medium",
+      dependency: 2,
+      health: "Healthy",
+    },
+    {
+      id: 3,
+      name: "Nabila",
+      role: "Knowledge Lead",
+      team: "Knowledge",
+      active: 2,
+      completed: 4,
+      focusLoad: "Medium",
+      dependency: 3,
+      health: "Moderate",
+    },
+    {
+      id: 4,
+      name: "Karim",
+      role: "Product Manager",
+      team: "Product",
+      active: 3,
+      completed: 5,
+      focusLoad: "Critical",
+      dependency: 5,
+      health: "At risk",
+    },
+  ];
 
-// ---------------- Page Component ----------------
-export default function Team() {
-  const [deptFilter, setDeptFilter] = useState<"all" | DepartmentType>("all");
-  const [inviteOpen, setInviteOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState<RoleType>("member");
-  const [inviting, setInviting] = useState(false);
+  const atRisk = members.filter((m) => m.health === "At risk").length;
 
-  const members = mockMembers;
-  const tasks = mockTasks;
+  const getHealthStyle = (health: Member["health"]) => {
+    switch (health) {
+      case "At risk":
+        return "border-rose-400/20 bg-rose-400/10 text-rose-300";
+      case "High load":
+        return "border-amber-400/20 bg-amber-400/10 text-amber-300";
+      case "Moderate":
+        return "border-cyan-400/20 bg-cyan-400/10 text-cyan-300";
+      default:
+        return "border-emerald-400/20 bg-emerald-400/10 text-emerald-300";
+    }
+  };
 
-  const filtered = members.filter(
-    (m) => deptFilter === "all" || m.department === deptFilter,
-  );
-
-  const getTaskCount = (email: string) =>
-    tasks.filter((t) => t.assigned_to === email).length;
-
-  const getCompletedCount = (email: string) =>
-    tasks.filter((t) => t.assigned_to === email && t.status === "done").length;
-
-  const handleInvite = () => {
-    if (!inviteEmail.trim()) return;
-    setInviting(true);
-    // Mock invite
-    setTimeout(() => {
-      members.push({
-        id: members.length + 1,
-        full_name: inviteEmail.split("@")[0],
-        email: inviteEmail.trim(),
-        department: "development",
-        role: inviteRole,
-      });
-      setInviteEmail("");
-      setInviteRole("member");
-      setInviting(false);
-      setInviteOpen(false);
-    }, 1000);
+  const getFocusStyle = (focus: Member["focusLoad"]) => {
+    switch (focus) {
+      case "Critical":
+        return "text-rose-300";
+      case "High":
+        return "text-amber-300";
+      case "Medium":
+        return "text-cyan-300";
+      default:
+        return "text-slate-300";
+    }
   };
 
   return (
     <Layout currentPageName="Team">
-      <div className="p-4 lg:p-8 max-w-7xl mx-auto space-y-5">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Team</h2>
-            <p className="text-sm text-gray-500 mt-0.5">
-              {members.length} team members
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Select value={deptFilter} onValueChange={setDeptFilter}>
-              <SelectTrigger className="w-36">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Depts</SelectItem>
-                <SelectItem value="development">Development</SelectItem>
-                <SelectItem value="marketing">Marketing</SelectItem>
-                <SelectItem value="design">Design</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={() => setInviteOpen(true)}>
-              <UserPlus className="w-4 h-4 mr-2" /> Invite
-            </Button>
-          </div>
-        </div>
-
-        {/* Team Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.length === 0 ? (
-            <p className="text-gray-400 col-span-full text-center py-12">
-              No team members found
-            </p>
-          ) : (
-            filtered.map((member, idx) => {
-              const initials = member.full_name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase();
-              const dept = deptConfig[member.department];
-              const taskCount = getTaskCount(member.email);
-              const doneCount = getCompletedCount(member.email);
-
-              return (
-                <Card
-                  key={member.id}
-                  className="p-5 hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start gap-3">
-                    <Avatar
-                      className={`w-11 h-11 ${avatarColors[idx % avatarColors.length]}`}
-                    >
-                      <AvatarFallback
-                        className={avatarColors[idx % avatarColors.length]}
-                      >
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 text-sm truncate">
-                        {member.full_name}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {member.job_title || member.role || "Member"}
-                      </p>
-                      <div className="flex items-center gap-2 mt-2">
-                        {dept && (
-                          <Badge
-                            className={`${dept.color} text-[10px] capitalize`}
-                          >
-                            {member.department}
-                          </Badge>
-                        )}
-                        <Badge variant="outline" className="text-[10px]">
-                          {member.role}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-3 border-t flex items-center justify-between">
-                    <div className="flex gap-4">
-                      <div className="text-center">
-                        <p className="text-lg font-bold text-gray-900">
-                          {taskCount}
-                        </p>
-                        <p className="text-[10px] text-gray-400">Tasks</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-lg font-bold text-emerald-600">
-                          {doneCount}
-                        </p>
-                        <p className="text-[10px] text-gray-400">Done</p>
-                      </div>
-                    </div>
-                    <a
-                      href={`mailto:${member.email}`}
-                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <Mail className="w-4 h-4 text-gray-400" />
-                    </a>
-                  </div>
-                </Card>
-              );
-            })
-          )}
-        </div>
-
-        {/* Invite Dialog */}
-        <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
-          <DialogContent className="sm:max-w-sm">
-            <DialogHeader>
-              <DialogTitle>Invite Team Member</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-2">
-              <div>
-                <Label>Email</Label>
-                <Input
-                  type="email"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="colleague@company.com"
-                  className="mt-1"
-                />
+      <div className="mx-auto max-w-7xl space-y-6">
+        {/* HERO */}
+        <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,rgba(6,182,212,0.16),rgba(79,70,229,0.08),rgba(255,255,255,0.03))] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.28)] lg:p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:justify-between">
+            <div className="max-w-3xl">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-200">
+                <Sparkles className="h-3.5 w-3.5 text-cyan-300" />
+                Team intelligence layer
               </div>
-              <div>
-                <Label>Role</Label>
-                <Select
-                  value={inviteRole}
-                  onValueChange={(v) => setInviteRole(v as RoleType)}
+
+              <h2 className="text-3xl font-semibold text-white lg:text-4xl">
+                People, capacity, and collaboration clarity
+              </h2>
+
+              <p className="mt-3 text-sm text-slate-300">
+                Understand not just who is working, but how work flows through
+                people. Detect overload, dependency risk, and ownership gaps
+                early.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 lg:w-90">
+              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <p className="text-xs text-slate-400">Team health</p>
+                <p
+                  className={`mt-2 text-lg font-semibold ${
+                    atRisk ? "text-rose-300" : "text-emerald-300"
+                  }`}
                 >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="member">Member</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
+                  {atRisk ? "Needs attention" : "Stable"}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <p className="text-xs text-slate-400">Dependency risk</p>
+                <p className="mt-2 text-lg font-semibold text-amber-300">
+                  High concentration
+                </p>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setInviteOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleInvite}
-                disabled={inviting || !inviteEmail.trim()}
+          </div>
+        </section>
+
+        {/* MEMBERS */}
+        <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+          <div className="xl:col-span-8 space-y-3">
+            {members.map((m) => (
+              <div
+                key={m.id}
+                className="rounded-[22px] border border-white/8 bg-black/20 p-5"
               >
-                {inviting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                Send Invite
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+                <div className="flex justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`rounded-full border px-2 py-1 text-[11px] ${getHealthStyle(
+                          m.health,
+                        )}`}
+                      >
+                        {m.health}
+                      </span>
+
+                      <span className="text-xs text-slate-400">{m.team}</span>
+                    </div>
+
+                    <h4 className="mt-2 text-white font-medium">{m.name}</h4>
+
+                    <p className="text-xs text-slate-400 mt-1">{m.role}</p>
+
+                    <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-400">
+                      <span>Active: {m.active}</span>
+                      <span>Completed: {m.completed}</span>
+                      <span
+                        className={`font-medium ${getFocusStyle(m.focusLoad)}`}
+                      >
+                        Focus: {m.focusLoad}
+                      </span>
+                      <span>Dependencies: {m.dependency}</span>
+                    </div>
+                  </div>
+
+                  <button className="text-xs text-slate-300 flex items-center gap-1">
+                    View workload <ArrowUpRight className="h-3 w-3" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* RIGHT SIDE */}
+          <div className="xl:col-span-4 space-y-6">
+            {/* RISKS */}
+            <div className="rounded-2xl border border-white/10 bg-white/4 p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <AlertTriangle className="text-rose-300 h-4 w-4" />
+                <h3 className="text-white text-sm font-medium">Team Risks</h3>
+              </div>
+
+              <div className="space-y-3 text-sm text-slate-300">
+                <p>• Product decisions concentrated on one owner</p>
+                <p>• Frontend delivery dependent on single contributor</p>
+                <p>• Knowledge layer lacks redundancy</p>
+              </div>
+            </div>
+
+            {/* COLLAB */}
+            <div className="rounded-2xl border border-white/10 bg-white/4 p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <GitBranch className="text-cyan-300 h-4 w-4" />
+                <h3 className="text-white text-sm font-medium">
+                  Collaboration Signals
+                </h3>
+              </div>
+
+              <div className="space-y-3 text-sm text-slate-300">
+                <p>• Cross-team collaboration active in Design ↔ Product</p>
+                <p>• Development working in isolated streams</p>
+                <p>• Knowledge team supporting multiple domains</p>
+              </div>
+            </div>
+
+            {/* PRINCIPLES */}
+            <div className="rounded-2xl border border-white/10 bg-white/4 p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <CheckCircle2 className="text-emerald-300 h-4 w-4" />
+                <h3 className="text-white text-sm font-medium">
+                  Team Principles
+                </h3>
+              </div>
+
+              <div className="space-y-3 text-sm text-slate-300">
+                <p>• Reduce single points of failure</p>
+                <p>• Balance cognitive load, not just tasks</p>
+                <p>• Encourage shared ownership across domains</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </Layout>
   );
