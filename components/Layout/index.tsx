@@ -1,13 +1,14 @@
 "use client";
 
 import { ReactNode } from "react";
-import Sidebar from "../sidebar";
+import Sidebar from "./sidebar";
 import Header from "./Header";
 import { useData } from "@/context/MainContext";
+import { PageName } from "@/types/layout";
 
 interface PropsType {
   children: ReactNode;
-  currentPageName: string;
+  currentPageName: PageName;
 }
 
 export default function Layout({ children, currentPageName }: PropsType) {

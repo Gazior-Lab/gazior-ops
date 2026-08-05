@@ -215,7 +215,8 @@ export default function Overview() {
     <Layout currentPageName="Overview">
       <div className="mx-auto max-w-7xl space-y-6">
         {/* Hero */}
-        <section className="">
+
+        <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,rgba(99,102,241,0.16),rgba(34,211,238,0.08),rgba(255,255,255,0.03))] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.28)] lg:p-8">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_30%)]" />
 
           <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
