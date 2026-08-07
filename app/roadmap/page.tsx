@@ -14,6 +14,7 @@ import {
   Target,
   Users,
 } from "lucide-react";
+import { StatCard } from "@/components/ui/stat-card";
 
 type Initiative = {
   id: number;
@@ -299,30 +300,14 @@ export default function RoadmapPage() {
         {/* Stats */}
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {roadmapStats.map((stat) => (
-            <div
+            <StatCard
               key={stat.label}
-              className="rounded-3xl border border-white/10 bg-white/4 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-medium text-slate-300">
-                    {stat.label}
-                  </p>
-                  <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
-                    {stat.value}
-                  </p>
-                  <p className="mt-2 text-xs leading-5 text-slate-400">
-                    {stat.subtext}
-                  </p>
-                </div>
-
-                <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-2xl border ${stat.accent}`}
-                >
-                  <stat.icon className="h-5 w-5" />
-                </div>
-              </div>
-            </div>
+              value={stat.value}
+              icon={stat.icon}
+              subtitle={stat.subtext}
+              title={stat.label}
+              accent={stat.accent}
+            />
           ))}
         </section>
 

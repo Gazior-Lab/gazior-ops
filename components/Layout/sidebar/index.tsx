@@ -4,7 +4,7 @@ import { useData } from "@/context/MainContext";
 import { X } from "lucide-react";
 import NavItems from "./NavItems";
 import { navGroupList } from "@/constants/navGroupList";
-import { PageName } from "@/types/layout";
+import { PageName } from "@/types/LayoutTypes";
 
 interface PropsType {
   currentPage: PageName;

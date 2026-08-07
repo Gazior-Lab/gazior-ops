@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import Sidebar from "./sidebar";
 import Header from "./Header";
 import { useData } from "@/context/MainContext";
-import { PageName } from "@/types/layout";
+import { PageName } from "@/types/LayoutTypes";
 
 interface PropsType {
   children: ReactNode;

@@ -3,7 +3,7 @@
 import { useData } from "@/context/MainContext";
 import { Menu, Search, Bell, Command, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { PageName } from "@/types/layout";
+import { PageName } from "@/types/LayoutTypes";
 import { navGroupList } from "@/constants/navGroupList";
 
 interface PropsType {

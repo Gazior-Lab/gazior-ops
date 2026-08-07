@@ -1,4 +1,4 @@
-import { NavGroupType } from "@/types/layout";
+import { NavGroupType } from "@/types/LayoutTypes";
 import {
   LayoutDashboard,
   ListTodo,
@@ -10,8 +10,9 @@ import {
   BookOpen,
   Rocket,
   Sparkles,
-  Inbox,
+  Building2,
   Wallet,
+  Activity,
 } from "lucide-react";
 
 export const navGroupList: NavGroupType[] = [
@@ -47,13 +48,20 @@ export const navGroupList: NavGroupType[] = [
     ],
   },
   {
-    title: "Growth & Sales",
+    title: "Growth",
     items: [
       {
-        name: "Leads",
-        icon: Inbox,
-        page: "Leads",
-        subtitle: "Triage inbound inquiries and qualify cold outreach targets.",
+        name: "Acquisition",
+        icon: Activity,
+        page: "Acquisition",
+        subtitle: "Monitor website traffic, top pages, and visitor flow.",
+      },
+      {
+        name: "Companies",
+        icon: Building2,
+        page: "Companies",
+        subtitle:
+          "Manage account intelligence, discovery, and sales pipelines.",
       },
       {
         name: "Customers",

@@ -6,6 +6,7 @@ export type PageName =
   | "Roadmap"
   | "Execution"
   | "Board"
+  | "Companies"
   | "Leads"
   | "Customers"
   | "Team"
@@ -13,10 +14,11 @@ export type PageName =
   | "Resources"
   | "Products"
   | "Updates"
-  | "Manifesto";
+  | "Manifesto"
+  | "Acquisition";
 
 export interface NavItemType {
-  name: string;
+  name: PageName;
   subtitle: string;
   icon: ForwardRefExoticComponent<
     Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
@@ -25,6 +27,6 @@ export interface NavItemType {
 }
 
 export interface NavGroupType {
-  title: PageName;
+  title: string;
   items: NavItemType[];
 }

@@ -1,4 +1,4 @@
-import { Lead, LeadStatus } from "@/types/leads";
+import { Lead, LeadStatus } from "@/types/InquiryTypes";
 
 /**
  * Custom business logic to derive a lead's status dynamically

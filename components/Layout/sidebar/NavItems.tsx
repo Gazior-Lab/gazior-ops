@@ -1,5 +1,5 @@
 import { reuseClasses } from "@/components/common/reuseClasses";
-import { NavItemType } from "@/types/layout";
+import { NavItemType } from "@/types/LayoutTypes";
 import Link from "next/link";
 
 interface PropsType {

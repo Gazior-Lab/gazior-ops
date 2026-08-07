@@ -1,6 +1,7 @@
 "use client";
 
 import Layout from "@/components/Layout";
+import { StatCard } from "@/components/ui/stat-card";
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -303,30 +304,14 @@ export default function ExecutionPage() {
               accent: "text-slate-200 border-white/10 bg-white/5",
             },
           ].map((stat) => (
-            <div
+            <StatCard
               key={stat.label}
-              className="rounded-3xl border border-white/10 bg-white/4 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-300">
-                    {stat.label}
-                  </p>
-                  <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
-                    {stat.value}
-                  </p>
-                  <p className="mt-2 text-xs leading-5 text-slate-400">
-                    {stat.subtext}
-                  </p>
-                </div>
-
-                <div
-                  className={`flex h-8 2xl:h-12 w-8 2xl:w-12 items-center justify-center rounded-2xl border ${stat.accent}`}
-                >
-                  <stat.icon className="h-4 2xl:h-5 w-4 2xl:w-5" />
-                </div>
-              </div>
-            </div>
+              title={stat.label}
+              subtitle={stat.subtext}
+              icon={stat.icon}
+              accent={stat.accent}
+              value={stat.value}
+            />
           ))}
         </section>
 
