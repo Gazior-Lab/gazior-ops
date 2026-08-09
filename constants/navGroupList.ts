@@ -13,6 +13,12 @@ import {
   Building2,
   Wallet,
   Activity,
+  Inbox,
+  Send,
+  FileEdit,
+  Clock,
+  LayoutTemplate,
+  AtSign,
 } from "lucide-react";
 
 export const navGroupList: NavGroupType[] = [
@@ -68,6 +74,47 @@ export const navGroupList: NavGroupType[] = [
         icon: Wallet,
         page: "Customers",
         subtitle: "Track ICP alignment, sales funnels, and customer momentum.",
+      },
+    ],
+  },
+  {
+    title: "Communications",
+    items: [
+      {
+        name: "Inbox",
+        icon: Inbox,
+        page: "communications", // Maps to /communications
+        subtitle: "Manage incoming emails and active CRM threads.",
+      },
+      {
+        name: "Sent",
+        icon: Send,
+        page: "communications/sent",
+        subtitle: "Review your sent messages and follow-ups.",
+      },
+      {
+        name: "Drafts",
+        icon: FileEdit,
+        page: "communications/drafts",
+        subtitle: "Finish composed messages before sending.",
+      },
+      {
+        name: "Scheduled",
+        icon: Clock,
+        page: "communications/scheduled",
+        subtitle: "Emails queued for future delivery.",
+      },
+      {
+        name: "Templates",
+        icon: LayoutTemplate,
+        page: "communications/email-templates",
+        subtitle: "Manage reusable email templates with CRM variables.",
+      },
+      {
+        name: "Accounts",
+        icon: AtSign,
+        page: "communications/accounts",
+        subtitle: "Configure mailbox connections and sender profiles.",
       },
     ],
   },

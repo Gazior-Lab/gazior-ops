@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import Layout from "@/components/Layout";
 import { Company } from "@/types/InquiryTypes";
 import { getCompanyById } from "@/services/companyService";
+import EmailComposer from "@/components/communication/EmailComposer";
+import { Send } from "lucide-react"; // Add Send if not already imported
 import {
   Building2,
   Mail,
@@ -30,6 +32,7 @@ export default function CompanyProfilePage() {
   const [company, setCompany] = useState<Company | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
 
   useEffect(() => {
     async function fetchCompany() {
@@ -101,8 +104,24 @@ export default function CompanyProfilePage() {
             <span className="inline-flex items-center rounded-full border border-blue-400/20 bg-blue-400/10 px-3 py-1.5 text-xs font-semibold text-blue-400">
               {company.status}
             </span>
+
+            <button
+              onClick={() => setIsComposerOpen(true)}
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 px-3 py-1.5 text-xs font-semibold text-indigo-300 transition hover:bg-indigo-500 hover:text-white"
+            >
+              <Send className="h-3.5 w-3.5" />
+              Send Email
+            </button>
           </div>
         </div>
+
+        {/* ADD THE COMPOSER COMPONENT ANYWHERE OUTSIDE THE MAIN FLOW */}
+        <EmailComposer
+          isOpen={isComposerOpen}
+          onClose={() => setIsComposerOpen(false)}
+          defaultTo={company.email}
+          defaultSubject={`Gazior Ops + ${company.companyName}`}
+        />
 
         <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,rgba(59,130,246,0.12),rgba(139,92,246,0.08),rgba(255,255,255,0.03))] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.28)] lg:p-8">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_32%)]" />

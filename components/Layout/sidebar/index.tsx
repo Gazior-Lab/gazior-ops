@@ -15,7 +15,7 @@ const Sidebar = ({ currentPage }: PropsType) => {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-50 flex w-62.5 transform flex-col border-r border-white/8 bg-[linear-gradient(180deg,rgba(10,14,28,0.96),rgba(8,11,22,0.98))] backdrop-blur-2xl transition-transform duration-300 lg:static ${
+      className={`fixed inset-y-0 left-0 z-50 flex w-55 transform flex-col border-r border-white/8 bg-[linear-gradient(180deg,rgba(10,14,28,0.96),rgba(8,11,22,0.98))] backdrop-blur-2xl transition-transform duration-300 lg:static ${
         sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       }`}
     >

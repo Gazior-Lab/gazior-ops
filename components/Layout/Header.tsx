@@ -13,7 +13,7 @@ interface PropsType {
 const user = {
   full_name: "Zisanur Haque",
   department: "R&D Operations",
-  role: "Founder",
+  role: "Product Engineer",
 };
 
 const initials = user.full_name

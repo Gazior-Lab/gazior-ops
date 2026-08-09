@@ -15,7 +15,13 @@ export type PageName =
   | "Products"
   | "Updates"
   | "Manifesto"
-  | "Acquisition";
+  | "Acquisition"
+  | "Inbox"
+  | "Sent"
+  | "Drafts"
+  | "Scheduled"
+  | "Templates"
+  | "Accounts";
 
 export interface NavItemType {
   name: PageName;

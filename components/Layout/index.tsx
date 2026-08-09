@@ -30,9 +30,7 @@ export default function Layout({ children, currentPageName }: PropsType) {
 
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-420 px-4 pb-6 pt-4 sm:px-6 lg:px-8">
-            <div className="min-h-[calc(100vh-110px)] rounded-[28px] border border-white/6 bg-white/2 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-5 lg:p-6">
-              {children}
-            </div>
+            {children}
           </div>
         </main>
       </div>
